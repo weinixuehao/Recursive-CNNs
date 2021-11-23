@@ -42,7 +42,7 @@ parser.add_argument('--model-type', default="resnet",
                     help='model type to be used. Example : resnet32, resnet20, densenet, test')
 parser.add_argument('--name', default="noname",
                     help='Name of the experiment')
-parser.add_argument('--output-dir', default="../",
+parser.add_argument('--output-dir', default="output/",
                     help='Directory to store the results; a new folder "DDMMYYYY" will be created '
                          'in the specified directory to save the results.')
 parser.add_argument('--decay', type=float, default=0.00001, help='Weight decay (L2 penalty).')
