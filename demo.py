@@ -4,15 +4,17 @@
 
 import cv2
 import numpy as np
-
+import glob
 import evaluation
+import os
+import shutil
 
 
 def args_processor():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--imagePath", default="../058.jpg", help="Path to the document image")
-    parser.add_argument("-o", "--outputPath", default="../output.jpg", help="Path to store the result")
+    parser.add_argument("-i", "--images", default="example_imgs", help="Document image folder")
+    parser.add_argument("-o", "--output", default="example_imgs/output", help="The folder to store results")
     parser.add_argument("-rf", "--retainFactor", help="Floating point in range (0,1) specifying retain factor",
                         default="0.85")
     parser.add_argument("-cm", "--cornerModel", help="Model for corner point refinement",
@@ -28,27 +30,29 @@ if __name__ == "__main__":
     corners_extractor = evaluation.corner_extractor.GetCorners(args.documentModel)
     corner_refiner = evaluation.corner_refiner.corner_finder(args.cornerModel)
 
-    img = cv2.imread(args.imagePath)
+    shutil.rmtree(args.output, ignore_errors=True)
+    os.makedirs(args.output)
+    imgPaths = glob.glob(f"{args.images}/*.jpg")
+    for imgPath in imgPaths:
+        img = cv2.imread(imgPath)
+        oImg = img
+        extracted_corners = corners_extractor.get(oImg)
+        corner_address = []
+        # Refine the detected corners using corner refiner
+        image_name = 0
+        for corner in extracted_corners:
+            image_name += 1
+            corner_img = corner[0]
+            refined_corner = np.array(corner_refiner.get_location(corner_img, 0.85))
 
-    oImg = img
+            # Converting from local co-ordinate to global co-ordinates of the image
+            refined_corner[0] += corner[1]
+            refined_corner[1] += corner[2]
 
-    extracted_corners = corners_extractor.get(oImg)
-    corner_address = []
-    # Refine the detected corners using corner refiner
-    image_name = 0
-    for corner in extracted_corners:
-        image_name += 1
-        corner_img = corner[0]
-        refined_corner = np.array(corner_refiner.get_location(corner_img, 0.85))
+            # Final results
+            corner_address.append(refined_corner)
 
-        # Converting from local co-ordinate to global co-ordinates of the image
-        refined_corner[0] += corner[1]
-        refined_corner[1] += corner[2]
-
-        # Final results
-        corner_address.append(refined_corner)
-
-    for a in range(0, len(extracted_corners)):
-        cv2.line(oImg, tuple(corner_address[a % 4]), tuple(corner_address[(a + 1) % 4]), (255, 0, 0), 4)
-
-    cv2.imwrite(args.outputPath, oImg)
+        for a in range(0, len(extracted_corners)):
+            cv2.line(oImg, tuple(corner_address[a % 4]), tuple(corner_address[(a + 1) % 4]), (255, 0, 0), 4)
+        filename = os.path.basename(imgPath)
+        cv2.imwrite(f"{args.output}/{filename}", oImg)
