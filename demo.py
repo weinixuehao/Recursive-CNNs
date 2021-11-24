@@ -16,7 +16,7 @@ def args_processor():
     parser.add_argument("-i", "--images", default="example_imgs", help="Document image folder")
     parser.add_argument("-o", "--output", default="example_imgs/output", help="The folder to store results")
     parser.add_argument("-rf", "--retainFactor", help="Floating point in range (0,1) specifying retain factor",
-                        default="0.85")
+                        default="0.85", type=float)
     parser.add_argument("-cm", "--cornerModel", help="Model for corner point refinement",
                         default="../cornerModelWell")
     parser.add_argument("-dm", "--documentModel", help="Model for document corners detection",
@@ -36,6 +36,7 @@ if __name__ == "__main__":
     for imgPath in imgPaths:
         img = cv2.imread(imgPath)
         oImg = img
+        e1 = cv2.getTickCount()
         extracted_corners = corners_extractor.get(oImg)
         corner_address = []
         # Refine the detected corners using corner refiner
@@ -43,7 +44,7 @@ if __name__ == "__main__":
         for corner in extracted_corners:
             image_name += 1
             corner_img = corner[0]
-            refined_corner = np.array(corner_refiner.get_location(corner_img, 0.85))
+            refined_corner = np.array(corner_refiner.get_location(corner_img, args.retainFactor))
 
             # Converting from local co-ordinate to global co-ordinates of the image
             refined_corner[0] += corner[1]
@@ -51,6 +52,8 @@ if __name__ == "__main__":
 
             # Final results
             corner_address.append(refined_corner)
+        e2 = cv2.getTickCount()
+        print(f"Took time:{(e2 - e1)/ cv2.getTickFrequency()}")
 
         for a in range(0, len(extracted_corners)):
             cv2.line(oImg, tuple(corner_address[a % 4]), tuple(corner_address[(a + 1) % 4]), (255, 0, 0), 4)
