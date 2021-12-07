@@ -15,6 +15,7 @@ def args_processor():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="Path to data files (Extract images using video_to_image.py first")
     parser.add_argument("-o", "--output-dir", help="Directory to store results")
+    parser.add_argument("-v", "--visualize", help="Draw the point on the corner", default=False, type=bool)
     parser.add_argument("--dataset", default="smartdoc", help="'smartdoc' or 'selfcollected' dataset")
     return parser.parse_args()
 
@@ -62,7 +63,8 @@ if __name__ == '__main__':
                         print(gt_list[a])
                         gt_store = list(np.array(gt_list[a]) / (300, 300))
                         img_store = cv2.resize(img_list[a], (64, 64))
-                        # cv2.circle(img_store, tuple(list((np.array(gt_store)*64).astype(int))), 2, (255, 0, 0), 2)
+                        if args.visualize:
+                            cv2.circle(img_store, tuple(list((np.array(gt_store)*64).astype(int))), 2, (255, 0, 0), 2)
 
                         cv2.imwrite(os.path.join(args.output_dir, f_name + ".jpg"),
                                     img_store, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
