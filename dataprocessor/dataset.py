@@ -1,7 +1,8 @@
-''' Document Localization using Recursive CNN
+""" Document Localization using Recursive CNN
  Maintainer : Khurram Javed
- Email : kjaved@ualberta.ca '''
+ Email : kjaved@ualberta.ca """
 
+import imgaug.augmenters as iaa
 import csv
 import logging
 import os
@@ -15,13 +16,13 @@ import utils.utils as utils
 # To incdude a new Dataset, inherit from Dataset and add all the Dataset specific parameters here.
 # Goal : Remove any data specific parameters from the rest of the code
 
-logger = logging.getLogger('iCARL')
+logger = logging.getLogger("iCARL")
 
 
-class Dataset():
-    '''
+class Dataset:
+    """
     Base class to reprenent a Dataset
-    '''
+    """
 
     def __init__(self, name):
         self.name = name
@@ -30,9 +31,9 @@ class Dataset():
 
 
 class SmartDoc(Dataset):
-    '''
+    """
     Class to include MNIST specific details
-    '''
+    """
 
     def __init__(self, directory="data"):
         super().__init__("smartdoc")
@@ -40,22 +41,68 @@ class SmartDoc(Dataset):
         self.labels = []
         for d in directory:
             self.directory = d
-            self.train_transform = transforms.Compose([transforms.Resize([32, 32]),
-                                                       transforms.ColorJitter(1.5, 1.5, 0.9, 0.5),
-                                                       transforms.ToTensor()])
+            self.train_transform = transforms.Compose(
+                [
+                    iaa.Sequential(
+                        [
+                            iaa.Resize(32),
+                            iaa.Sometimes(
+                                0.5,
+                                iaa.OneOf(
+                                    [
+                                        iaa.GaussianBlur(
+                                            (0, 3.0)
+                                        ),  # blur images with a sigma between 0 and 3.0
+                                        iaa.AverageBlur(
+                                            k=(2, 11)
+                                        ),  # blur image using local means with kernel sizes between 2 and 7
+                                        iaa.MedianBlur(
+                                            k=(3, 11)
+                                        ),  # blur image using local medians with kernel sizes between 2 and 7
+                                        iaa.MotionBlur(k=15, angle=[-45, 45])
+                                    ]
+                                ),
+                            ),
+                            iaa.Sometimes(0.5, iaa.OneOf([
+                                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50)))),
+                                iaa.AddToBrightness((-30, 30)),
+                                iaa.MultiplyBrightness((0.5, 1.5)),
+                                iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
+                                iaa.Grayscale(alpha=(0.0, 1.0)),
+                                iaa.ChangeColorTemperature((1100, 10000)),
+                                iaa.KMeansColorQuantization()
+                            ]))
+                        ]
+                    ).augment_image,
+                    #     transforms.Resize([32, 32]),
+                    #    transforms.ColorJitter(1.5, 1.5, 0.9, 0.5),
+                    transforms.ToTensor(),
+                ]
+            )
 
-            self.test_transform = transforms.Compose([transforms.Resize([32, 32]),
-                                                      transforms.ToTensor()])
+            self.test_transform = transforms.Compose(
+                [
+                    iaa.Sequential(
+                        [
+                            iaa.Resize(32),
+                        ]
+                    ).augment_image,
+                    transforms.ToTensor(),
+                ]
+            )
 
             logger.info("Pass train/test data paths here")
 
             self.classes_list = {}
 
             file_names = []
-            print (self.directory, "gt.csv")
-            with open(os.path.join(self.directory, "gt.csv"), 'r') as csvfile:
-                spamreader = csv.reader(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            print(self.directory, "gt.csv")
+            with open(os.path.join(self.directory, "gt.csv"), "r") as csvfile:
+                spamreader = csv.reader(
+                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                )
                 import ast
+
                 for row in spamreader:
                     file_names.append(row[0])
                     self.data.append(os.path.join(self.directory, row[0]))
@@ -71,9 +118,9 @@ class SmartDoc(Dataset):
 
 
 class SmartDocDirectories(Dataset):
-    '''
+    """
     Class to include MNIST specific details
-    '''
+    """
 
     def __init__(self, directory="data"):
         super().__init__("smartdoc")
@@ -81,10 +128,10 @@ class SmartDocDirectories(Dataset):
         self.labels = []
 
         for folder in os.listdir(directory):
-            if (os.path.isdir(directory + "/" + folder)):
+            if os.path.isdir(directory + "/" + folder):
                 for file in os.listdir(directory + "/" + folder):
                     images_dir = directory + "/" + folder + "/" + file
-                    if (os.path.isdir(images_dir)):
+                    if os.path.isdir(images_dir):
 
                         list_gt = []
                         tree = ET.parse(images_dir + "/" + file + ".gt")
@@ -104,15 +151,24 @@ class SmartDocDirectories(Dataset):
                                 # img = cv2.imread(images_dir + "/" + image)
                                 self.data.append(os.path.join(images_dir, image))
 
-                                for point in list_gt[int(float(image[0:-4])) - 1].iter("point"):
+                                for point in list_gt[int(float(image[0:-4])) - 1].iter(
+                                    "point"
+                                ):
                                     myDict = point.attrib
 
                                     list_of_points[myDict["name"]] = (
-                                        int(float(myDict['x'])), int(float(myDict['y'])))
+                                        int(float(myDict["x"])),
+                                        int(float(myDict["y"])),
+                                    )
 
                                 ground_truth = np.asarray(
-                                    (list_of_points["tl"], list_of_points["tr"], list_of_points["br"],
-                                     list_of_points["bl"]))
+                                    (
+                                        list_of_points["tl"],
+                                        list_of_points["tr"],
+                                        list_of_points["br"],
+                                        list_of_points["bl"],
+                                    )
+                                )
                                 ground_truth = utils.sort_gt(ground_truth)
                                 self.labels.append(ground_truth)
 
@@ -126,10 +182,11 @@ class SmartDocDirectories(Dataset):
         for a in range(len(self.data)):
             self.myData.append([self.data[a], self.labels[a]])
 
+
 class SelfCollectedDataset(Dataset):
-    '''
+    """
     Class to include MNIST specific details
-    '''
+    """
 
     def __init__(self, directory="data"):
         super().__init__("smartdoc")
@@ -140,9 +197,13 @@ class SelfCollectedDataset(Dataset):
             # print (image)
             if image.endswith("jpg") or image.endswith("JPG"):
                 if os.path.isfile(os.path.join(directory, image + ".csv")):
-                    with open(os.path.join(directory, image + ".csv"), 'r') as csvfile:
-                        spamwriter = csv.reader(csvfile, delimiter=' ',
-                                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                    with open(os.path.join(directory, image + ".csv"), "r") as csvfile:
+                        spamwriter = csv.reader(
+                            csvfile,
+                            delimiter=" ",
+                            quotechar="|",
+                            quoting=csv.QUOTE_MINIMAL,
+                        )
 
                         img_path = os.path.join(directory, image)
 
@@ -165,12 +226,10 @@ class SelfCollectedDataset(Dataset):
             self.myData.append([self.data[a], self.labels[a]])
 
 
-
-
 class SmartDocCorner(Dataset):
-    '''
+    """
     Class to include MNIST specific details
-    '''
+    """
 
     def __init__(self, directory="data"):
         super().__init__("smartdoc")
@@ -178,21 +237,29 @@ class SmartDocCorner(Dataset):
         self.labels = []
         for d in directory:
             self.directory = d
-            self.train_transform = transforms.Compose([transforms.Resize([32, 32]),
-                                                       transforms.ColorJitter(0.5, 0.5, 0.5, 0.5),
-                                                       transforms.ToTensor()])
+            self.train_transform = transforms.Compose(
+                [
+                    transforms.Resize([32, 32]),
+                    transforms.ColorJitter(0.5, 0.5, 0.5, 0.5),
+                    transforms.ToTensor(),
+                ]
+            )
 
-            self.test_transform = transforms.Compose([transforms.Resize([32, 32]),
-                                                      transforms.ToTensor()])
+            self.test_transform = transforms.Compose(
+                [transforms.Resize([32, 32]), transforms.ToTensor()]
+            )
 
             logger.info("Pass train/test data paths here")
 
             self.classes_list = {}
 
             file_names = []
-            with open(os.path.join(self.directory, "gt.csv"), 'r') as csvfile:
-                spamreader = csv.reader(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            with open(os.path.join(self.directory, "gt.csv"), "r") as csvfile:
+                spamreader = csv.reader(
+                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                )
                 import ast
+
                 for row in spamreader:
                     file_names.append(row[0])
                     self.data.append(os.path.join(self.directory, row[0]))

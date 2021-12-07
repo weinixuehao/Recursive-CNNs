@@ -8,6 +8,7 @@ import PIL
 import torch.utils.data as td
 import tqdm
 from PIL import Image
+import cv2
 
 logger = logging.getLogger('iCARL')
 
@@ -51,7 +52,8 @@ class RamLoader(td.Dataset):
         self.loaded_data = []
         logger.info("Loading data in RAM")
         for i in tqdm.tqdm(self.data[0]):
-            img = Image.open(i)
+            # img = Image.open(i)
+            img = cv2.imread(i)
             if self.transform is not None:
                 img = self.transform(img)
             self.loaded_data.append(img)
