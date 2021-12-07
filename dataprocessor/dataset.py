@@ -47,7 +47,7 @@ class SmartDoc(Dataset):
                         [
                             iaa.Resize(32),
                             iaa.Sometimes(
-                                0.8,
+                                0.3,
                                 iaa.OneOf(
                                     [
                                         iaa.GaussianBlur(
@@ -63,7 +63,7 @@ class SmartDoc(Dataset):
                                     ]
                                 ),
                             ),
-                            iaa.Sometimes(0.8, iaa.OneOf([
+                            iaa.Sometimes(0.3, iaa.OneOf([
                                 iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50)))),
                                 iaa.AddToBrightness((-30, 30)),
                                 iaa.MultiplyBrightness((0.5, 1.5)),
