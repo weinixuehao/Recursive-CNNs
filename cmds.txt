@@ -1,5 +1,5 @@
 #!/bin/bash
 
-python train_model.py --name DocModel -i dataset/generated_dataset/selfCollectedData_DocCyclic dataset/generated_dataset/smartdocData_DocTrainC --lr 0.5 --schedule 20 30 35 -v dataset/generated_dataset/smartDocData_DocTestC --batch-size 16 --model-type resnet --loader ram
+python train_model.py --name DocModel -i dataset/final_dataset/selfCollectedData_DocCyclic dataset/final_dataset/smartdocData_DocTrainC dataset/final_dataset/my_doc_train --lr 0.5 --schedule 20 30 35 -v dataset/final_dataset/smartDocData_DocTestC dataset/final_dataset/my_doc_test --batch-size 16 --model-type resnet --loader ram
 
-python train_model.py --name CornerModel -i dataset/generated_dataset/cornerTrain64 --lr 0.5 --schedule 20 30 35 -v dataset/generated_dataset/selfCollectedData_CornDetec --batch-size 16 --model-type resnet --loader ram --dataset corner
+python train_model.py --name CornerModel -i dataset/final_dataset/cornerTrain64 --lr 0.5 --schedule 20 30 35 -v dataset/final_dataset/selfCollectedData_CornDetec --batch-size 16 --model-type resnet --loader ram --dataset corner
