@@ -30,6 +30,47 @@ class Dataset:
         self.labels = []
 
 
+def getTransformsByImgaug():
+    return iaa.Sequential(
+            [
+                iaa.Resize(32),
+                iaa.Sometimes(
+                    0.3,
+                    iaa.OneOf(
+                        [
+                            iaa.GaussianBlur(
+                                (0, 3.0)
+                            ),  # blur images with a sigma between 0 and 3.0
+                            iaa.AverageBlur(
+                                k=(2, 11)
+                            ),  # blur image using local means with kernel sizes between 2 and 7
+                            iaa.MedianBlur(
+                                k=(3, 11)
+                            ),  # blur image using local medians with kernel sizes between 2 and 7
+                            iaa.MotionBlur(k=15, angle=[-45, 45]),
+                        ]
+                    ),
+                ),
+                iaa.Sometimes(
+                    0.3,
+                    iaa.OneOf(
+                        [
+                            iaa.WithHueAndSaturation(
+                                iaa.WithChannels(0, iaa.Add((0, 50)))
+                            ),
+                            iaa.AddToBrightness((-30, 30)),
+                            iaa.MultiplyBrightness((0.5, 1.5)),
+                            iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
+                            iaa.Grayscale(alpha=(0.0, 1.0)),
+                            iaa.ChangeColorTemperature((1100, 10000)),
+                            iaa.KMeansColorQuantization(),
+                        ]
+                    ),
+                ),
+            ]
+        ).augment_image
+
+
 class SmartDoc(Dataset):
     """
     Class to include MNIST specific details
@@ -43,37 +84,7 @@ class SmartDoc(Dataset):
             self.directory = d
             self.train_transform = transforms.Compose(
                 [
-                    iaa.Sequential(
-                        [
-                            iaa.Resize(32),
-                            iaa.Sometimes(
-                                0.3,
-                                iaa.OneOf(
-                                    [
-                                        iaa.GaussianBlur(
-                                            (0, 3.0)
-                                        ),  # blur images with a sigma between 0 and 3.0
-                                        iaa.AverageBlur(
-                                            k=(2, 11)
-                                        ),  # blur image using local means with kernel sizes between 2 and 7
-                                        iaa.MedianBlur(
-                                            k=(3, 11)
-                                        ),  # blur image using local medians with kernel sizes between 2 and 7
-                                        iaa.MotionBlur(k=15, angle=[-45, 45])
-                                    ]
-                                ),
-                            ),
-                            iaa.Sometimes(0.3, iaa.OneOf([
-                                iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50)))),
-                                iaa.AddToBrightness((-30, 30)),
-                                iaa.MultiplyBrightness((0.5, 1.5)),
-                                iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
-                                iaa.Grayscale(alpha=(0.0, 1.0)),
-                                iaa.ChangeColorTemperature((1100, 10000)),
-                                iaa.KMeansColorQuantization()
-                            ]))
-                        ]
-                    ).augment_image,
+                    getTransformsByImgaug(),
                     #     transforms.Resize([32, 32]),
                     #    transforms.ColorJitter(1.5, 1.5, 0.9, 0.5),
                     transforms.ToTensor(),
@@ -239,14 +250,25 @@ class SmartDocCorner(Dataset):
             self.directory = d
             self.train_transform = transforms.Compose(
                 [
-                    transforms.Resize([32, 32]),
-                    transforms.ColorJitter(0.5, 0.5, 0.5, 0.5),
+                    # getTransformsByImgaug(),
+                    iaa.Sequential(
+                        [
+                            iaa.Resize(32),
+                        ]
+                    ).augment_image,
                     transforms.ToTensor(),
                 ]
             )
 
             self.test_transform = transforms.Compose(
-                [transforms.Resize([32, 32]), transforms.ToTensor()]
+                [
+                    iaa.Sequential(
+                        [
+                            iaa.Resize(32),
+                        ]
+                    ).augment_image,
+                    transforms.ToTensor(),
+                ]
             )
 
             logger.info("Pass train/test data paths here")
