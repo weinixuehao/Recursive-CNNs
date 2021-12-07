@@ -250,12 +250,7 @@ class SmartDocCorner(Dataset):
             self.directory = d
             self.train_transform = transforms.Compose(
                 [
-                    # getTransformsByImgaug(),
-                    iaa.Sequential(
-                        [
-                            iaa.Resize(32),
-                        ]
-                    ).augment_image,
+                    getTransformsByImgaug(),
                     transforms.ToTensor(),
                 ]
             )
