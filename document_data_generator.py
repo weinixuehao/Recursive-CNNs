@@ -6,12 +6,25 @@ import numpy as np
 import utils
 import dataprocessor
 
+import argparse
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 def args_processor():
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="Path to data files (Extract images using video_to_image.py first")
     parser.add_argument("-o", "--output-dir", help="Directory to store results")
     parser.add_argument("-v", "--visualize", help="Draw the point on the corner", default=False, type=bool)
+    parser.add_argument("-a", "--augment", type=str2bool, nargs='?',
+                        const=True, default=True,
+                        help="Augment image dataset")
     parser.add_argument("--dataset", default="smartdoc", help="'smartdoc' or 'selfcollected' dataset")
     return parser.parse_args()
 
@@ -50,10 +63,11 @@ if __name__ == '__main__':
                     img = cv2.resize(img, (1920, 1920))
 
                 corner_cords = target
-
-                for angle in range(0, 271, 90):
+                angles = [0, 271, 90] if args.augment else [0]
+                random_crops = [0, 16] if args.augment else [0]
+                for angle in angles:
                     img_rotate, gt_rotate = utils.utils.rotate(img, corner_cords, angle)
-                    for random_crop in range(0, 16):
+                    for random_crop in random_crops:
                         counter += 1
                         f_name = str(counter).zfill(8)
 
