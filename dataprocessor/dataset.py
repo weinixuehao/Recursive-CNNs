@@ -67,6 +67,17 @@ def getTransformsByImgaug():
                         ]
                     ),
                 ),
+                iaa.Sometimes(
+                    0.3,
+                    iaa.OneOf(
+                        [
+                            iaa.Clouds(),
+                            iaa.Fog(),
+                            iaa.Snowflakes(flake_size=(0.1, 0.4), speed=(0.01, 0.05)),
+                            iaa.Rain(speed=(0.1, 0.3))
+                        ]
+                    ),
+                ),
             ]
         ).augment_image
 
