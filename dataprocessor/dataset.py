@@ -32,54 +32,118 @@ class Dataset:
 
 def getTransformsByImgaug():
     return iaa.Sequential(
-            [
-                iaa.Resize(32),
-                iaa.Sometimes(
-                    0.3,
-                    iaa.OneOf(
-                        [
-                            iaa.GaussianBlur(
-                                (0, 3.0)
-                            ),  # blur images with a sigma between 0 and 3.0
-                            iaa.AverageBlur(
-                                k=(2, 11)
-                            ),  # blur image using local means with kernel sizes between 2 and 7
-                            iaa.MedianBlur(
-                                k=(3, 11)
-                            ),  # blur image using local medians with kernel sizes between 2 and 7
-                            iaa.MotionBlur(k=15, angle=[-45, 45]),
-                        ]
-                    ),
+        [
+            iaa.Resize(32),
+            # Add blur
+            iaa.Sometimes(
+                0.3,
+                iaa.OneOf(
+                    [
+                        iaa.GaussianBlur(
+                            (0, 3.0)
+                        ),  # blur images with a sigma between 0 and 3.0
+                        iaa.AverageBlur(
+                            k=(2, 11)
+                        ),  # blur image using local means with kernel sizes between 2 and 7
+                        iaa.MedianBlur(
+                            k=(3, 11)
+                        ),  # blur image using local medians with kernel sizes between 2 and 7
+                        iaa.MotionBlur(k=15, angle=[-45, 45]),
+                    ]
                 ),
-                iaa.Sometimes(
-                    0.3,
-                    iaa.OneOf(
-                        [
-                            iaa.WithHueAndSaturation(
-                                iaa.WithChannels(0, iaa.Add((0, 50)))
-                            ),
-                            iaa.AddToBrightness((-30, 30)),
-                            iaa.MultiplyBrightness((0.5, 1.5)),
-                            iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
-                            iaa.Grayscale(alpha=(0.0, 1.0)),
-                            iaa.ChangeColorTemperature((1100, 10000)),
-                            iaa.KMeansColorQuantization(),
-                        ]
-                    ),
+            ),
+            # Add color
+            iaa.Sometimes(
+                0.3,
+                iaa.OneOf(
+                    [
+                        iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50)))),
+                        iaa.AddToBrightness((-30, 30)),
+                        iaa.MultiplyBrightness((0.5, 1.5)),
+                        iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
+                        iaa.Grayscale(alpha=(0.0, 1.0)),
+                        iaa.ChangeColorTemperature((1100, 10000)),
+                        iaa.KMeansColorQuantization(),
+                    ]
                 ),
-                iaa.Sometimes(
-                    0.3,
-                    iaa.OneOf(
-                        [
+            ),
+            # Add wether
+            iaa.Sometimes(
+                0.3,
+                iaa.OneOf(
+                    [
+                        iaa.Clouds(),
+                        iaa.Fog(),
+                        iaa.Snowflakes(flake_size=(0.1, 0.4), speed=(0.01, 0.05)),
+                        iaa.Rain(speed=(0.1, 0.3)),
+                    ]
+                ),
+            ),
+            # Add contrast
+            iaa.Sometimes(
+                0.4,
+                iaa.OneOf(
+                    [
+                        iaa.GammaContrast((0.5, 2.0)),
+                        iaa.GammaContrast((0.5, 2.0), per_channel=True),
+                        iaa.SigmoidContrast(gain=(3, 10), cutoff=(0.4, 0.6)),
+                        iaa.SigmoidContrast(
+                            gain=(3, 10), cutoff=(0.4, 0.6), per_channel=True
+                        ),
+                        iaa.LogContrast(gain=(0.6, 1.4)),
+                        iaa.LogContrast(gain=(0.6, 1.4), per_channel=True),
+                        iaa.LinearContrast((0.4, 1.6)),
+                        iaa.LinearContrast((0.4, 1.6), per_channel=True),
+                        iaa.AllChannelsCLAHE(),
+                        iaa.AllChannelsCLAHE(clip_limit=(1, 10)),
+                        iaa.AllChannelsCLAHE(clip_limit=(1, 10), per_channel=True),
+                        iaa.Alpha((0.0, 1.0), iaa.HistogramEqualization()),
+                        iaa.Alpha((0.0, 1.0), iaa.AllChannelsHistogramEqualization()),
+                        iaa.AllChannelsHistogramEqualization(),
+                    ]
+                ),
+            ),
+            # Add blend
+            iaa.Sometimes(
+                0.4,
+                iaa.OneOf(
+                    [
+                        iaa.BlendAlpha(0.5, iaa.Grayscale(1.0)),
+                        iaa.BlendAlpha((0.0, 1.0), iaa.Grayscale(1.0)),
+                        iaa.BlendAlpha(
+                            (0.0, 1.0),
+                            foreground=iaa.Add(100),
+                            background=iaa.Multiply(0.2),
+                        ),
+                        iaa.BlendAlphaMask(
+                            iaa.InvertMaskGen(0.5, iaa.VerticalLinearGradientMaskGen()),
                             iaa.Clouds(),
-                            iaa.Fog(),
-                            iaa.Snowflakes(flake_size=(0.1, 0.4), speed=(0.01, 0.05)),
-                            iaa.Rain(speed=(0.1, 0.3))
-                        ]
-                    ),
+                        ),
+                        iaa.BlendAlphaElementwise(
+                            (0.0, 1.0),
+                            foreground=iaa.Add(100),
+                            background=iaa.Multiply(0.2),
+                        ),
+                        iaa.BlendAlphaFrequencyNoise(
+                            first=iaa.EdgeDetect(1.0),
+                            upscale_method="linear",
+                            exponent=-2,
+                            sigmoid=False,
+                        ),
+                        iaa.BlendAlphaSomeColors(iaa.Grayscale(1.0)),
+                        iaa.BlendAlphaHorizontalLinearGradient(
+                            iaa.TotalDropout(1.0), min_value=0.2, max_value=0.8
+                        ),
+                        iaa.BlendAlphaHorizontalLinearGradient(
+                            iaa.AveragePooling(11),
+                            start_at=(0.0, 1.0),
+                            end_at=(0.0, 1.0),
+                        ),
+                    ]
                 ),
-            ]
-        ).augment_image
+            ),
+        ]
+    ).augment_image
 
 
 class SmartDoc(Dataset):
