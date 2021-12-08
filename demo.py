@@ -8,6 +8,7 @@ import glob
 import evaluation
 import os
 import shutil
+import time
 
 
 def args_processor():
@@ -29,9 +30,10 @@ if __name__ == "__main__":
 
     corners_extractor = evaluation.corner_extractor.GetCorners(args.documentModel)
     corner_refiner = evaluation.corner_refiner.corner_finder(args.cornerModel)
-
-    shutil.rmtree(args.output, ignore_errors=True)
-    os.makedirs(args.output)
+    now_date = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))
+    output_dir = f"{args.output}_{now_date}"
+    shutil.rmtree(output_dir, ignore_errors=True)
+    os.makedirs(output_dir)
     imgPaths = glob.glob(f"{args.images}/*.jpg")
     for imgPath in imgPaths:
         img = cv2.imread(imgPath)
@@ -58,4 +60,4 @@ if __name__ == "__main__":
         for a in range(0, len(extracted_corners)):
             cv2.line(oImg, tuple(corner_address[a % 4]), tuple(corner_address[(a + 1) % 4]), (255, 0, 0), 4)
         filename = os.path.basename(imgPath)
-        cv2.imwrite(f"{args.output}/{filename}", oImg)
+        cv2.imwrite(f"{output_dir}/{filename}", oImg)
