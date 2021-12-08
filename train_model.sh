@@ -1,0 +1,5 @@
+#!/bin/bash
+
+python train_model.py --name DocModel -i dataset/final_dataset/selfCollectedData_DocCyclic dataset/final_dataset/smartdocData_DocTrainC dataset/final_dataset/my_doc_train --lr 0.5 --schedule 20 30 35 -v dataset/final_dataset/smartDocData_DocTestC dataset/final_dataset/my_doc_test --batch-size 16 --model-type resnet --loader ram --epochs 80
+
+python train_model.py --name CornerModel -i dataset/final_dataset/cornerTrain64 dataset/final_dataset/my_corner_train --lr 0.5 --schedule 20 30 35 -v dataset/final_dataset/selfCollectedData_CornDetec dataset/final_dataset/my_corner_test --batch-size 16 --model-type resnet --loader ram --dataset corner --epochs 80
