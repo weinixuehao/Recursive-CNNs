@@ -125,7 +125,7 @@ def getTransformsByImgaug():
                             background=iaa.Multiply(0.2),
                         ),
                         iaa.BlendAlphaFrequencyNoise(
-                            first=iaa.EdgeDetect(1.0),
+                            foreground=iaa.EdgeDetect(1.0),
                             upscale_method="linear",
                             exponent=-2,
                             sigmoid=False,
@@ -133,12 +133,7 @@ def getTransformsByImgaug():
                         iaa.BlendAlphaSomeColors(iaa.Grayscale(1.0)),
                         iaa.BlendAlphaHorizontalLinearGradient(
                             iaa.TotalDropout(1.0), min_value=0.2, max_value=0.8
-                        ),
-                        iaa.BlendAlphaHorizontalLinearGradient(
-                            iaa.AveragePooling(11),
-                            start_at=(0.0, 1.0),
-                            end_at=(0.0, 1.0),
-                        ),
+                        )
                     ]
                 ),
             ),
