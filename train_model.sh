@@ -2,16 +2,24 @@
 
 set -e # exit when any command fails
 
-if [ "$1" != "" ]; then
-    epochs="$1"
+if [ "$1" == "dev" ]; then
+    doc_dataset_train="dataset/selfCollectedData_DocCyclic"
+    doc_dataset_test="dataset/my_doc_test"
+
+    corner_dataset_train="dataset/my_corner_train"
+    corner_dataset_test="dataset/my_corner_test"
 else
-    epochs=40 # The number of epochs is 40.
+    doc_dataset_train="dataset/selfCollectedData_DocCyclic dataset/smartdocData_DocTrainC dataset/my_doc_train"
+    doc_dataset_test="dataset/smartDocData_DocTestC dataset/my_doc_test"
+
+    corner_dataset_train="dataset/cornerTrain64 dataset/my_corner_train"
+    corner_dataset_test="dataset/selfCollectedData_CornDetec dataset/my_corner_test"
 fi
 
-echo $epochs
+# echo "doc_dataset_train=$doc_dataset_train corner_dataset_test=$corner_dataset_test"
 
-python train_model.py --name DocModel -i dataset/selfCollectedData_DocCyclic dataset/smartdocData_DocTrainC dataset/my_doc_train \
---lr 0.5 --schedule 20 30 35 -v dataset/smartDocData_DocTestC dataset/my_doc_test --batch-size 16 --model-type resnet --loader ram --epochs $epochs
+python train_model.py --name DocModel -i $doc_dataset_train \
+--lr 0.5 --schedule 20 30 35 -v $doc_dataset_test --batch-size 16 --model-type resnet --loader ram
 
-python train_model.py --name CornerModel -i dataset/cornerTrain64 dataset/my_corner_train \
---lr 0.5 --schedule 20 30 35 -v dataset/selfCollectedData_CornDetec dataset/my_corner_test --batch-size 16 --model-type resnet --loader ram --dataset corner --epochs $epochs
+python train_model.py --name CornerModel -i $corner_dataset_train \
+--lr 0.5 --schedule 20 30 35 -v $corner_dataset_test --batch-size 16 --model-type resnet --loader ram --dataset corner
