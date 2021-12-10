@@ -81,7 +81,7 @@ def getTransformsByImgaug():
             ),
             # Add contrast
             iaa.Sometimes(
-                0.4,
+                0.3,
                 iaa.OneOf(
                     [
                         iaa.GammaContrast((0.5, 2.0)),
@@ -102,41 +102,7 @@ def getTransformsByImgaug():
                         iaa.AllChannelsHistogramEqualization(),
                     ]
                 ),
-            ),
-            # Add blend
-            iaa.Sometimes(
-                0.1,
-                iaa.OneOf(
-                    [
-                        iaa.BlendAlpha(0.5, iaa.Grayscale(1.0)),
-                        iaa.BlendAlpha((0.0, 1.0), iaa.Grayscale(1.0)),
-                        iaa.BlendAlpha(
-                            (0.0, 1.0),
-                            foreground=iaa.Add(100),
-                            background=iaa.Multiply(0.2),
-                        ),
-                        iaa.BlendAlphaMask(
-                            iaa.InvertMaskGen(0.5, iaa.VerticalLinearGradientMaskGen()),
-                            iaa.Clouds(),
-                        ),
-                        iaa.BlendAlphaElementwise(
-                            (0.0, 1.0),
-                            foreground=iaa.Add(100),
-                            background=iaa.Multiply(0.2),
-                        ),
-                        iaa.BlendAlphaFrequencyNoise(
-                            foreground=iaa.EdgeDetect(1.0),
-                            upscale_method="linear",
-                            exponent=-2,
-                            sigmoid=False,
-                        ),
-                        iaa.BlendAlphaSomeColors(iaa.Grayscale(1.0)),
-                        iaa.BlendAlphaHorizontalLinearGradient(
-                            iaa.TotalDropout(1.0), min_value=0.2, max_value=0.8
-                        )
-                    ]
-                ),
-            ),
+            )
         ]
     ).augment_image
 
