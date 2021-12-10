@@ -80,29 +80,29 @@ def getTransformsByImgaug():
                 ),
             ),
             # Add contrast
-            # iaa.Sometimes(
-            #     0.3,
-            #     iaa.OneOf(
-            #         [
-            #             iaa.GammaContrast((0.5, 2.0)),
-            #             iaa.GammaContrast((0.5, 2.0), per_channel=True),
-            #             iaa.SigmoidContrast(gain=(3, 10), cutoff=(0.4, 0.6)),
-            #             iaa.SigmoidContrast(
-            #                 gain=(3, 10), cutoff=(0.4, 0.6), per_channel=True
-            #             ),
-            #             iaa.LogContrast(gain=(0.6, 1.4)),
-            #             iaa.LogContrast(gain=(0.6, 1.4), per_channel=True),
-            #             iaa.LinearContrast((0.4, 1.6)),
-            #             iaa.LinearContrast((0.4, 1.6), per_channel=True),
-            #             iaa.AllChannelsCLAHE(),
-            #             iaa.AllChannelsCLAHE(clip_limit=(1, 10)),
-            #             iaa.AllChannelsCLAHE(clip_limit=(1, 10), per_channel=True),
-            #             iaa.Alpha((0.0, 1.0), iaa.HistogramEqualization()),
-            #             iaa.Alpha((0.0, 1.0), iaa.AllChannelsHistogramEqualization()),
-            #             iaa.AllChannelsHistogramEqualization(),
-            #         ]
-            #     ),
-            # )
+            iaa.Sometimes(
+                0.3,
+                iaa.OneOf(
+                    [
+                        iaa.GammaContrast((0.5, 2.0)),
+                        iaa.GammaContrast((0.5, 2.0), per_channel=True),
+                        iaa.SigmoidContrast(gain=(3, 10), cutoff=(0.4, 0.6)),
+                        iaa.SigmoidContrast(
+                            gain=(3, 10), cutoff=(0.4, 0.6), per_channel=True
+                        ),
+                        iaa.LogContrast(gain=(0.6, 1.4)),
+                        iaa.LogContrast(gain=(0.6, 1.4), per_channel=True),
+                        iaa.LinearContrast((0.4, 1.6)),
+                        iaa.LinearContrast((0.4, 1.6), per_channel=True),
+                        iaa.AllChannelsCLAHE(),
+                        iaa.AllChannelsCLAHE(clip_limit=(1, 10)),
+                        iaa.AllChannelsCLAHE(clip_limit=(1, 10), per_channel=True),
+                        iaa.Alpha((0.0, 1.0), iaa.HistogramEqualization()),
+                        iaa.Alpha((0.0, 1.0), iaa.AllChannelsHistogramEqualization()),
+                        iaa.AllChannelsHistogramEqualization(),
+                    ]
+                ),
+            )
         ]
     ).augment_image
 
