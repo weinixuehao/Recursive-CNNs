@@ -36,7 +36,7 @@ def getTransformsByImgaug():
             iaa.Resize(32),
             # Add blur
             iaa.Sometimes(
-                0.3,
+                0.1,
                 iaa.OneOf(
                     [
                         iaa.GaussianBlur(
@@ -54,7 +54,7 @@ def getTransformsByImgaug():
             ),
             # Add color
             iaa.Sometimes(
-                0.3,
+                0.1,
                 iaa.OneOf(
                     [
                         iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50)))),
@@ -69,7 +69,7 @@ def getTransformsByImgaug():
             ),
             # Add wether
             iaa.Sometimes(
-                0.3,
+                0.1,
                 iaa.OneOf(
                     [
                         iaa.Clouds(),
@@ -81,7 +81,7 @@ def getTransformsByImgaug():
             ),
             # Add contrast
             iaa.Sometimes(
-                0.3,
+                0.1,
                 iaa.OneOf(
                     [
                         iaa.GammaContrast((0.5, 2.0)),
