@@ -2,7 +2,7 @@
 
 set -e # exit when any command fails
 
-if [[ "$1" != "" ]]; then
+if [ "$1" != "" ]; then
     epochs="$1"
 else
     epochs=40 # The number of epochs is 40.
