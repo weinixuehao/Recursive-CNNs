@@ -105,7 +105,7 @@ def getTransformsByImgaug():
             ),
             # Add blend
             iaa.Sometimes(
-                0.4,
+                0.1,
                 iaa.OneOf(
                     [
                         iaa.BlendAlpha(0.5, iaa.Grayscale(1.0)),
