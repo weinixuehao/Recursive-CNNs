@@ -9,11 +9,11 @@ if [ "$1" == "dev" ]; then
     corner_dataset_train="dataset/my_corner_train"
     corner_dataset_test="dataset/my_corner_test"
 else
-    doc_dataset_train="dataset/selfCollectedData_DocCyclic dataset/smartdocData_DocTrainC dataset/my_doc_train"
-    doc_dataset_test="dataset/smartDocData_DocTestC dataset/my_doc_test"
+    doc_dataset_train="dataset/selfCollectedData_DocCyclic dataset/smartdocData_DocTrainC dataset/my_doc_train dataset/sythetic_doc_train"
+    doc_dataset_test="dataset/smartDocData_DocTestC dataset/my_doc_test dataset/sythetic_doc_test"
 
-    corner_dataset_train="dataset/cornerTrain64 dataset/my_corner_train"
-    corner_dataset_test="dataset/selfCollectedData_CornDetec dataset/my_corner_test"
+    corner_dataset_train="dataset/cornerTrain64 dataset/my_corner_train dataset/sythetic_corner_train"
+    corner_dataset_test="dataset/selfCollectedData_CornDetec dataset/my_corner_test dataset/sythetic_corner_test"
 fi
 
 # echo "doc_dataset_train=$doc_dataset_train corner_dataset_test=$corner_dataset_test"
