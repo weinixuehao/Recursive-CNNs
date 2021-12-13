@@ -231,8 +231,7 @@ def __get_cords(cord, min_start, max_end, size=299, buf=5, random_scale=True):
     x_start = int(x_start)
     if x_start >= cord:
         print("XSTART AND CORD", x_start, cord)
-    # 因为有角的坐标点，刚好在x的起始位置。即：cord = 0
-    assert (x_start <= cord)
+    assert (x_start < cord)
     while ((x_start < min_start) or (x_start + size > max_end) or (x_start + size <= cord)):
         # x_start = random.randint(int(min(max(min_start, int(cord - size + buf)), cord - buf - 1)), cord - buf)
         temp = -1
@@ -250,11 +249,7 @@ def __get_cords(cord, min_start, max_end, size=299, buf=5, random_scale=True):
     assert (x_start >= 0)
     if x_start >= cord:
         print("XSTART AND CORD", x_start, cord)
-    assert (x_start <= cord)
-    if x_start + size - max_end > 0: #max_end就是图片的width, size是随机的。因此当x靠近或者等于width的时候。x_start+size是会超越max_end(width), 因此这时使x_start + size = max_end(width)
-       over_num = x_start + size - max_end
-       assert(over_num < 4) # 约束超过的数不能大于4.
-       size = size - over_num
+    assert (x_start < cord)
     assert (x_start + size <= max_end)
     assert (x_start + size > cord)
     return (x_start, int(x_start + size))
