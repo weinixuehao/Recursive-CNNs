@@ -19,7 +19,7 @@ fi
 # echo "doc_dataset_train=$doc_dataset_train corner_dataset_test=$corner_dataset_test"
 
 python train_model.py --name DocModel -i $doc_dataset_train \
---lr 0.005 --schedule 10 20 30 -v $doc_dataset_test --batch-size 16 --model-type resnet --loader ram
+--lr 0.005 --schedule 10 20 30 -v $doc_dataset_test --batch-size 32 --model-type resnet --loader ram
 
 python train_model.py --name CornerModel -i $corner_dataset_train \
---lr 0.005 --schedule 10 20 30 -v $corner_dataset_test --batch-size 16 --model-type resnet --loader ram --dataset corner
+--lr 0.005 --schedule 10 20 30 -v $corner_dataset_test --batch-size 32 --model-type resnet --loader ram --dataset corner
