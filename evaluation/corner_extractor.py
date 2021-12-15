@@ -11,8 +11,8 @@ import model
 
 
 class GetCorners:
-    def __init__(self, checkpoint_dir):
-        self.model = model.ModelFactory.get_model("resnet", 'document')
+    def __init__(self, checkpoint_dir, model_type = "resnet"):
+        self.model = model.ModelFactory.get_model(model_type, 'document')
         self.model.load_state_dict(torch.load(checkpoint_dir, map_location='cpu'))
         if torch.cuda.is_available():
             self.model.cuda()

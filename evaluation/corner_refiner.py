@@ -11,9 +11,9 @@ import model
 
 
 class corner_finder():
-    def __init__(self, CHECKPOINT_DIR):
+    def __init__(self, CHECKPOINT_DIR, model_type = "resnet"):
 
-        self.model = model.ModelFactory.get_model("resnet", "corner")
+        self.model = model.ModelFactory.get_model(model_type, "corner")
         self.model.load_state_dict(torch.load(CHECKPOINT_DIR, map_location='cpu'))
         if torch.cuda.is_available():
             self.model.cuda()

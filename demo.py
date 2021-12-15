@@ -15,6 +15,8 @@ def args_processor():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--images", default="example_imgs", help="Document image folder")
+    parser.add_argument('--model-type', default="resnet",
+                    help='model type to be used. Example : resnet32, resnet20, densenet, test')
     parser.add_argument("-o", "--output", default="example_imgs/output", help="The folder to store results")
     parser.add_argument("-rf", "--retainFactor", help="Floating point in range (0,1) specifying retain factor",
                         default="0.85", type=float)
@@ -28,8 +30,8 @@ def args_processor():
 if __name__ == "__main__":
     args = args_processor()
 
-    corners_extractor = evaluation.corner_extractor.GetCorners(args.documentModel)
-    corner_refiner = evaluation.corner_refiner.corner_finder(args.cornerModel)
+    corners_extractor = evaluation.corner_extractor.GetCorners(args.documentModel, args.model_type)
+    corner_refiner = evaluation.corner_refiner.corner_finder(args.cornerModel, args.model_type)
     now_date = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))
     output_dir = f"{args.output}_{now_date}"
     shutil.rmtree(output_dir, ignore_errors=True)
