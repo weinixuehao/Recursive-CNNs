@@ -21,10 +21,10 @@ fi
 # 1、resnet model
 
 python train_model.py --name DocModel -i $doc_dataset_train \
---lr 0.5 --schedule 20 30 35 -v $doc_dataset_test --batch-size 32 --model-type resnet --loader ram
+--lr 0.5 --schedule 20 30 35 -v $doc_dataset_test --batch-size 8 --model-type resnet --loader ram
 
 python train_model.py --name CornerModel -i $corner_dataset_train \
---lr 0.5 --schedule 20 30 35 -v $corner_dataset_test --batch-size 32 --model-type resnet --loader ram --dataset corner
+--lr 0.5 --schedule 20 30 35 -v $corner_dataset_test --batch-size 8 --model-type resnet --loader ram --dataset corner
 
 # 2、mobile_net model
 
